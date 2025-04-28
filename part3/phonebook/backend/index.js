@@ -4,10 +4,10 @@ const app = express();
 app.use(express.json());
 
 morgan.token("content", (request, response) => {
-  const body = request.body;
+  const body = request.body || {};
   return JSON.stringify({
-    name: body.name,
-    number: body.number,
+    name: body.name || "",
+    number: body.number || "",
   });
 });
 
