@@ -3,7 +3,7 @@ import phoneService from "./services/phonebook";
 import Notification from "./components/Notification";
 
 function App() {
-  const [persons, setPersons] = useState([{}]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
@@ -18,16 +18,24 @@ function App() {
 
   const handleDelete = (event) => {
     window.confirm(`Delete ${event.name}?`);
-    phoneService.deletePerson(event).catch((error) => {
-      setErrorMessage(
-        `Information of ${newName} has already been removed from server`
-      );
-      setMessageType("warning");
-      setTimeout(() => {
-        setErrorMessage(null);
-        setMessageType("success");
-      }, 5000);
-    });
+    phoneService
+      .deletePerson(event)
+      .then(() => {
+        setPersons(persons.filter((p) => p.name !== event.name));
+        setErrorMessage(
+          `${event.name} has been successfully removed from the phonebook!`
+        );
+      })
+      .catch((error) => {
+        setMessageType("warning");
+        setErrorMessage(
+          `Information of ${newName} has already been removed from server`
+        );
+      });
+    setTimeout(() => {
+      setErrorMessage(null);
+      setMessageType("success");
+    }, 5000);
   };
 
   const showPersons = persons.map((person) => (
