@@ -14,7 +14,7 @@ function App() {
     phoneService.getAll().then((initialNumbers) => {
       setPersons(initialNumbers);
     });
-  });
+  }, []);
 
   const handleDelete = (event) => {
     window.confirm(`Delete ${event.name}?`);
