@@ -23,7 +23,7 @@ const App = (props) => {
       important: Math.random() < 0.5,
     };
 
-    noteService.create().then((retunedNote) => {
+    noteService.create(noteObject).then((retunedNote) => {
       setNotes(notes.concat(retunedNote));
       setNewNote("");
     });

@@ -55,13 +55,21 @@ function App() {
         alert(`${newName} is already added to the phonebook`);
       }
     } else {
-      phoneService.create(newPerson).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-      });
-      setErrorMessage(
-        `${newName} has successfully been added to the phonebook`
-      );
+      phoneService
+        .create(newPerson)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setErrorMessage(
+            `${newName} has successfully been added to the phonebook`
+          );
+        })
+        .catch((error) => {
+          setMessageType("warning");
+          setErrorMessage(error.response.data.error);
+        });
+
       setTimeout(() => {
+        setMessageType("success");
         setErrorMessage(null);
       }, 5000);
     }
@@ -90,13 +98,19 @@ function App() {
     window.confirm(
       `${person.name} is already added to the phonebook, replace the old number with a new one?`
     );
-    phoneService.modifyPerson(person.id, newPerson).then((returnedPerson) => {
-      setPersons(persons.map((p) => (p.name === name ? returnedPerson : p)));
-      setErrorMessage(`${person.name}'s phone number has been updated!`);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
-    });
+    phoneService
+      .modifyPerson(person.id, newPerson)
+      .then((returnedPerson) => {
+        setPersons(persons.map((p) => (p.name === name ? returnedPerson : p)));
+        setErrorMessage(`${person.name}'s phone number has been updated!`);
+      })
+      .catch((error) => {
+        setMessageType("warning");
+        setErrorMessage(error.response.data.error);
+      });
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
   };
 
   const getNumberByName = (name) => {
