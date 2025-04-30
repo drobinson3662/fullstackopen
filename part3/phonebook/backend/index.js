@@ -1,8 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
 app.use(express.json());
 app.use(express.static("dist"));
+const Phonebook = require("./models/phonebook");
 
 morgan.token("content", (request, response) => {
   const body = request.body || {};
@@ -14,28 +16,7 @@ morgan.token("content", (request, response) => {
 
 app.use(morgan(":method :url :status :response-time[3] :content"));
 
-let persons = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+let persons = [];
 
 // Method used for Info Screen
 const getInfo = () => {
@@ -63,7 +44,9 @@ app.get("/info", (request, response) => {
 
 // API Routing
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Phonebook.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
 // get by id
@@ -101,25 +84,24 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  if (persons.find((p) => p.name === body.name)) {
-    return response.status(400).json({
-      error: `${body.name} is already added to the phonebook!`,
-    });
-  }
+  // if (persons.find((p) => p.name === body.name)) {
+  //   return response.status(400).json({
+  //     error: `${body.name} is already added to the phonebook!`,
+  //   });
+  // }
 
-  const person = {
-    id: getId(),
+  const person = new Phonebook({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 //Port
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
